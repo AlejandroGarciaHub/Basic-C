@@ -14,10 +14,45 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>Extern Storage Class.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>8</integer>
+		</dict>
+		<key>FileRead.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>10</integer>
+		</dict>
+		<key>Null-Pointers.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>Pointers Arithmetic.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
 		<key>Pointers.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>3</integer>
+		</dict>
+		<key>ReadData.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>9</integer>
+		</dict>
+		<key>Register Storage class.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
+		<key>Static Storage Class.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>7</integer>
 		</dict>
 		<key>T-Casting.xcscheme</key>
 		<dict>
@@ -32,7 +67,32 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>494EE9541F55E22C004F6F1A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>494EE95F1F55E7ED004F6F1A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>494EE96A1F55E9B1004F6F1A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>494EE9751F55EB3E004F6F1A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>4964BCD11F4F532900E8CC81</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>496821CC1F57625B004392AD</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -43,6 +103,16 @@
 			<true/>
 		</dict>
 		<key>4970F9111F4E0ECC0053D5C6</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>497B87221F54C24A00AF7A2B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>498D6D3D1F588FC100FFC523</key>
 		<dict>
 			<key>primary</key>
 			<true/>
