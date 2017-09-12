@@ -13,15 +13,15 @@
 #include <sys/time.h>
 
 int nData,nFeatures, nCentroides;
-double **datos, **centroides,**centroidesVacio;
-static FILE *fp_data, *fp_centroides;
+double **datos, **centroides,**centroidesNuevos;
+static FILE *fp_data, *fp_centroides,*fp_resultados;
 
 //clock_t start;
 //clock_t end;
 
 struct timeval t0;
 struct timeval t1;
-float elapsed;
+double elapsed;
 
 int change;
 int iteracion;
@@ -30,8 +30,9 @@ void readData(FILE *data, int Ndata,int NFeatures,double **datos);
 void inicializacion(int argc, char *argv[]);
 void asignacion(double **datos,double **centroides,int nData, int nFeatures, int nCentroides);
 void recalculo(double **datos, double **centroides,int nData, int nFeatures, int nCentroides);
-float timedifference_msec(struct timeval t0, struct timeval t1);
-void sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures);
+double timedifference_msec(struct timeval t0, struct timeval t1);
+double sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures);
+//double calculoErrorCuadrado(int Nobjetos, int Ncentros, int Ncaracteristicas, double **centroides, double **datos);
 
 
 int main(argc, argv)
@@ -39,12 +40,16 @@ int main(argc, argv)
     char * argv[];
 {
     
-    if ((fp_data=fopen(argv[1], "r+"))==NULL) {
+    if ((fp_data=fopen(argv[1], "r"))==NULL) {
         fprintf(stderr, "No file datos %s\n",argv[1]);
         return 0;
     }
-    if ((fp_data=fopen(argv[4], "r+"))==NULL) {
+    if ((fp_data=fopen(argv[4], "r"))==NULL) {
         fprintf(stderr, "No file centriodes %s\n",argv[4]);
+        return 0;
+    }
+    if ((fp_data=fopen(argv[6], "a"))==NULL) {
+        fprintf(stderr, "No file resultados %s\n",argv[6]);
         return 0;
     }
     
@@ -52,10 +57,6 @@ int main(argc, argv)
 //    start = clock();
     iteracion=1;
     gettimeofday(&t0, 0);
-    
-    gettimeofday(&t1, 0);
-    elapsed = timedifference_msec(t0, t1);
-    printf("Inicio, %f milliseconds.\n", elapsed);
     
     inicializacion(argc,argv);
 
@@ -65,6 +66,9 @@ int main(argc, argv)
 
     fp_centroides=fopen(argv[4],"r");
     readData(fp_centroides, nCentroides, nFeatures, centroides);
+
+    centroidesNuevos=centroides;
+
     fclose(fp_centroides);
     
 
@@ -88,8 +92,26 @@ int main(argc, argv)
 //    }
 
 
+    
     asignacion(datos,centroides,nData,nFeatures,nCentroides);
+//    for (int i=0; i<nCentroides; i++) {
+//        
+//        printf("Vacios :");
+//        for (int j=0; j<nFeatures; j++) {
+//            printf("%lf ",centroidesNuevos[i][j]);
+//        }
+//        printf("\n");
+//    }
     recalculo(datos, centroides, nData, nFeatures, nCentroides);
+//    for (int i=0; i<nCentroides; i++) {
+//        
+//        printf("Vacios :");
+//        for (int j=0; j<nFeatures; j++) {
+//            printf("%lf ",centroidesNuevos[i][j]);
+//        }
+//        printf("\n");
+//    }
+
     
     
 //    gettimeofday(&t1, 0);
@@ -98,38 +120,50 @@ int main(argc, argv)
     
 //    end = clock();
 //    printf("Tiempo: %f\n", (double)(end - start));
-    
+
     do {
 //        gettimeofday(&t1, 0);
 //        elapsed = timedifference_msec(t0, t1);
-        iteracion++;
+        
 //        printf("Iteracion %d, %f milliseconds.\n",iteracion, elapsed);
 //        end = clock();
 //        printf("Tiempo: %f\n", (double)(end - start));
-        asignacion(datos,centroidesVacio,nData,nFeatures,nCentroides);
-        recalculo(datos, centroidesVacio, nData, nFeatures, nCentroides);
+        asignacion(datos,centroidesNuevos,nData,nFeatures,nCentroides);
+        recalculo(datos, centroidesNuevos, nData, nFeatures, nCentroides);
+        iteracion++;
     }
     while(change==1);
 //    end = clock();
 //    printf("Tiempo final: %f\n", (double)((end - start)));
-
-    //Numero de iteraciones
-    //Tiempo en milisegundos
+    
     gettimeofday(&t1, 0);
-    elapsed = timedifference_msec(t0, t1);
-    printf("Iteracion Final %d, %f milliseconds.\n",iteracion, elapsed);
+    
     //Error de agrupamiento
-    sumatoria_error(datos,nData,centroidesVacio,nCentroides,nFeatures);
+//    double error=calculoErrorCuadrado(nData, nCentroides, nFeatures, centroidesNuevos, datos);
+//    printf("Error: %lf\n",error);
+    double error=sumatoria_error(datos,nData,centroidesNuevos,nCentroides,nFeatures);
     
-    
-    
-//    printf("CAX %lf: ",cAX);
-//    printf("CBX %lf: ",cBX);
-//    printf("CCX %lf: ",cCX);
+    //Numero de iteraciones
+//    printf("Iteraciones: %d\n",iteracion);
 //    
-//    printf("CAY %lf: ",cAY);
-//    printf("CBY %lf: ",cBY);
-//    printf("CCY %lf: ",cCY);
+//    //Tiempo en milisegundos
+    elapsed = timedifference_msec(t0, t1);
+//    printf("%lf milliseconds.\n", elapsed);
+    
+//    for (int i=0; i<nCentroides; i++) {
+//        
+//        printf("Vacios :");
+//        for (int j=0; j<nFeatures; j++) {
+//            printf("%lf ",centroidesNuevos[i][j]);
+//        }
+//        printf("\n");
+//    }
+
+
+    fp_resultados = fopen(argv[6],"a");
+    fprintf(fp_resultados,"%.16g\t %lf\t %d\n", elapsed, error, iteracion); //Imprime en el archivo [Tiempo Error Iteracion]
+    fclose(fp_resultados);
+   
 
     return 0;
 }
@@ -158,48 +192,60 @@ void inicializacion(int argc, char *argv[]){
     nCentroides=atoi(argv[5]);
     
     datos=(double **) malloc(nData*sizeof(double *));
-    centroides=(double **) malloc(nCentroides*sizeof(double *));
-    centroidesVacio=(double **) malloc(nCentroides*sizeof(double *));
+    
     int i;
     for(i=0;i<nData;i++){
-        datos[i]=(double *)malloc((nFeatures+3)*sizeof(double));
+        datos[i]=(double *)malloc((nFeatures+1)*sizeof(double));
     }
     
+    
+    centroides=(double **) malloc(nCentroides*sizeof(double *));
     for(i=0;i<nCentroides;i++){
         centroides[i]=(double *)malloc(nFeatures*sizeof(double));
     }
+    
+    centroidesNuevos=(double **) malloc(nCentroides*sizeof(double *));
     for(i=0;i<nCentroides;i++){
-        centroidesVacio[i]=(double *)malloc(nFeatures*sizeof(double));
+        centroidesNuevos[i]=(double *)malloc(nFeatures*sizeof(double));
     }
-   
+    
 }
 
 void asignacion(double **datos,double **centroides,int nData, int nFeatures, int nCentroides){
     
     int i,j,k,group;
+    double distancia;
 
+    
         for (i=0; i<nData; i++) {
-            for (j=0; j<nFeatures-1; j++) {
-                group=0;
-                datos[i][nFeatures]=pow(10, 8);
-                for (k=0; k<nCentroides; k++) {
-                    double distancia=sqrt(pow(datos[i][j]-centroides[k][j], 2)+pow(datos[i][j+1]-centroides[k][j+1], 2));
- 
-                    if (distancia<datos[i][nFeatures]){
+            
 
-                        datos[i][nFeatures]=distancia;
-                        group=(k+1);
-                    }
-//                    printf("Distancia [%d][%d] =%lf\n",i,j,distancia);
-//                    printf("Group: %d\n",group);
+            datos[i][nFeatures]=pow(10, 8);
+            group=0;
+
+            for (k=0; k<nCentroides; k++) {
+                
+                distancia=0;
+                
+                for (j=0; j<nFeatures; j++) {
+
+                    distancia+=pow(datos[i][j]-centroides[k][j], 2);
                 }
-                if (group!=0) {
+                distancia=sqrt(distancia);
+                if (distancia<datos[i][nFeatures]){
+                    
+                    datos[i][nFeatures]=distancia;
+                    group=(k+1);
+                }
+                
+//                printf("Distancia [%d][%d] =%lf\n",i,j,distancia);
+//                printf("Group: %d\n",group);
+                if (k==nCentroides-1) {
              //       printf("Asigno: %d\n",group);
                     datos[i][nFeatures]=group;
 //                    printf("datosTres [%d][%d]: %lf\n",i,j,datos[i][nFeatures]);
 //                    printf("Termino una fila\n");
                 }
-                
             }
     }
     
@@ -217,63 +263,81 @@ void recalculo(double **datos, double **centroides,int nData, int nFeatures, int
     
     int sum;
     int size;
-    
+    change=0;
     int i,j,k;
     for (k=1; k<=nCentroides; k++) {
         for (j=0; j<nFeatures; j++) {
             sum=0;
             size=0;
-            change=0;
+ 
             for (i=0; i<nData; i++) {
                 if ((int)datos[i][nFeatures]==k) {
                     sum+=datos[i][j];
                     size++;
                 }
             }
+            double centroide=((double)sum/(double)size);
 //            printf("Sum: %d\n",sum);
 //            printf("Size: %d\n",size);
 
-            if ((double)centroidesVacio[k-1][j]!=((double)sum/(double)size)) {
-//                printf("Hubo cambio: %lf",centroidesVacio[k-1][j]);
+            if ((double)centroidesNuevos[k-1][j]!=centroide&&isnan(centroide)==0) {
+//                printf("Hubo cambio: %lf",centroidesNuevos[k-1][j]);
 //                printf("Hubo cambio: %lf\n ",((double)sum/(double)size));
                 change=1;
-                centroidesVacio[k-1][j]=((double)sum/(double)size);
+                
+                centroidesNuevos[k-1][j]=((double)sum/(double)size);
             }
+            //Colocar centroides default cuando no cambia
         
         }
     }
-    
-    
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        printf("Vacios");
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroidesVacio[i][j]);
-//        }
-//        printf("\n");
-//    }
-//    printf("Cambio: %d\n",change);
-    
 }
 
-void sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures ){
+double sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures ){
     int i,j,k;
     double error=0;
     
     for (k=1; k<=nCentroides; k++) {
         for (i=0; i<nData; i++) {
-            for (j=0; j<nFeatures-1; j++) {
-                if ((int)datos[i][nFeatures]==k) {
-                    double distancia=sqrt(pow(datos[i][j]-centroides[k-1][j], 2)+pow(datos[i][j+1]-centroides[k-1][j+1], 2));
-                    error+=distancia;
+            double distancia=0;
+            for (j=0; j<nFeatures; j++) {
+                if (datos[i][nFeatures]==k) {
+                    distancia+=pow(datos[i][j]-centroides[k-1][j], 2);
                 }
             }
+            error+=sqrt(distancia);
         }
     }
-    printf("Sumatoria error de agrupamiento: %lf\n",error/2);
+    return error;
 }
 
-float timedifference_msec(struct timeval t0, struct timeval t1)
+//double calculoErrorCuadrado(int Nobjetos, int Ncentros, int Ncaracteristicas, double **centroides, double **datos){
+//    
+//    int i,j,k;
+//    double sum, error = 0;
+//    
+//    for (i = 0; i < Ncentros; i++){ //Numero de objetos
+//        
+//        for (j = 0; j < Nobjetos; j++){ //Numero de centroides
+//            sum = 0;
+//            
+//            if(datos[j][Ncaracteristicas] == (i+1)){
+//                
+//                for (k = 0; k < Ncaracteristicas; k++){ //Numero de caracteristicas
+//                    sum+= pow( centroides[i][k] - datos[j][k] , 2);
+//                }
+//                error += sqrt(sum);
+//                
+//            }
+//        }
+//        
+//    }
+//    return error;
+//}
+
+
+double timedifference_msec(struct timeval t0, struct timeval t1)
 {
     return (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
 }
+

@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>C-Means.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>11</integer>
+		</dict>
 		<key>Enum.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -62,6 +67,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>4916D9DC1F6706CA009F0EF1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>492398501F4E14EB0084A09D</key>
 		<dict>
 			<key>primary</key>

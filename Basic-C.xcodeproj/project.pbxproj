@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4916D9E01F6706CA009F0EF1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4916D9DF1F6706CA009F0EF1 /* main.c */; };
 		492398541F4E14EB0084A09D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 492398531F4E14EB0084A09D /* main.c */; };
 		494EE9581F55E22C004F6F1A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 494EE9571F55E22C004F6F1A /* main.c */; };
 		494EE9631F55E7ED004F6F1A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 494EE9621F55E7ED004F6F1A /* main.c */; };
@@ -22,6 +23,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4916D9DB1F6706CA009F0EF1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		4923984F1F4E14EB0084A09D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,6 +134,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4916D9DD1F6706CA009F0EF1 /* C-Means */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "C-Means"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4916D9DF1F6706CA009F0EF1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		492398511F4E14EB0084A09D /* T-Casting */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "T-Casting"; sourceTree = BUILT_PRODUCTS_DIR; };
 		492398531F4E14EB0084A09D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		494EE9551F55E22C004F6F1A /* Pointers Arithmetic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Pointers Arithmetic"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +162,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4916D9DA1F6706CA009F0EF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4923984E1F4E14EB0084A09D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -230,6 +249,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4916D9DE1F6706CA009F0EF1 /* C-Means */ = {
+			isa = PBXGroup;
+			children = (
+				4916D9DF1F6706CA009F0EF1 /* main.c */,
+			);
+			path = "C-Means";
+			sourceTree = "<group>";
+		};
 		492398521F4E14EB0084A09D /* T-Casting */ = {
 			isa = PBXGroup;
 			children = (
@@ -301,6 +328,7 @@
 				494EE9771F55EB3E004F6F1A /* Extern Storage Class */,
 				496821CE1F57625B004392AD /* ReadData */,
 				498D6D3F1F588FC100FFC523 /* FileRead */,
+				4916D9DE1F6706CA009F0EF1 /* C-Means */,
 				4970F9051F4E0AAC0053D5C6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -319,6 +347,7 @@
 				494EE9761F55EB3E004F6F1A /* Extern Storage Class */,
 				496821CD1F57625B004392AD /* ReadData */,
 				498D6D3E1F588FC100FFC523 /* FileRead */,
+				4916D9DD1F6706CA009F0EF1 /* C-Means */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -358,6 +387,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4916D9DC1F6706CA009F0EF1 /* C-Means */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4916D9E31F6706CA009F0EF1 /* Build configuration list for PBXNativeTarget "C-Means" */;
+			buildPhases = (
+				4916D9D91F6706CA009F0EF1 /* Sources */,
+				4916D9DA1F6706CA009F0EF1 /* Frameworks */,
+				4916D9DB1F6706CA009F0EF1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "C-Means";
+			productName = "C-Means";
+			productReference = 4916D9DD1F6706CA009F0EF1 /* C-Means */;
+			productType = "com.apple.product-type.tool";
+		};
 		492398501F4E14EB0084A09D /* T-Casting */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 492398571F4E14EB0084A09D /* Build configuration list for PBXNativeTarget "T-Casting" */;
@@ -554,6 +600,10 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Miguel Garcia";
 				TargetAttributes = {
+					4916D9DC1F6706CA009F0EF1 = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
 					492398501F4E14EB0084A09D = {
 						CreatedOnToolsVersion = 8.3.3;
 						ProvisioningStyle = Automatic;
@@ -623,11 +673,20 @@
 				494EE9751F55EB3E004F6F1A /* Extern Storage Class */,
 				496821CC1F57625B004392AD /* ReadData */,
 				498D6D3D1F588FC100FFC523 /* FileRead */,
+				4916D9DC1F6706CA009F0EF1 /* C-Means */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4916D9D91F6706CA009F0EF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4916D9E01F6706CA009F0EF1 /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4923984D1F4E14EB0084A09D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -720,6 +779,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		4916D9E11F6706CA009F0EF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4916D9E21F6706CA009F0EF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		492398551F4E14EB0084A09D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -966,6 +1039,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4916D9E31F6706CA009F0EF1 /* Build configuration list for PBXNativeTarget "C-Means" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4916D9E11F6706CA009F0EF1 /* Debug */,
+				4916D9E21F6706CA009F0EF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		492398571F4E14EB0084A09D /* Build configuration list for PBXNativeTarget "T-Casting" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
