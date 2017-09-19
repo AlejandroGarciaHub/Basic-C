@@ -12,34 +12,33 @@
 #include <math.h>
 #include <sys/time.h>
 
-int nData,nFeatures, nCentroides;
-double **datos, **centroides,**centroidesNuevos;
-static FILE *fp_data, *fp_centroides,*fp_resultados;
+int nData,nFeatures, nCentroides;   //Definicion de variables, tamaño de muestra, numero de caracteristicas y numero de centroides
+double **datos,**centroidesPrincipales;    //Arreglos dinamicos de dos dimensiones para, matriz de la muestra, matriz de los centroides y matriz de centroides recalculados
+static FILE *fp_data, *fp_centroides,*fp_resultados;    //Instancias de la clase FILE para manipular tres ficheros de texto, los cuales contiene la muestra, los centroides iniciales y el archivo donde se alojaran los resultados respectivamente
 
-//clock_t start;
-//clock_t end;
 
-struct timeval t0;
+struct timeval t0;  //Instancias de la estructura timeval para acceder a sus segundos y mcirosegundos
 struct timeval t1;
-double elapsed;
+double elapsed; //Variable donde se alojará el tiempo transcurrido desde el inicio al fin del calculo del algoritmo
 
-int change;
-int iteracion;
+int change; //Flag que indica si hubo algun cambio al recalcular los centroides
+int iteracion;  //Aloja el numero de iteraciones necesarias para agrupar los datos
 
-void readData(FILE *data, int Ndata,int NFeatures,double **datos);
+//Declaracion de las funciones
+void readData(FILE *data, int Ndata,int NFeatures,double **datos);//
 void inicializacion(int argc, char *argv[]);
 void asignacion(double **datos,double **centroides,int nData, int nFeatures, int nCentroides);
 void recalculo(double **datos, double **centroides,int nData, int nFeatures, int nCentroides);
 double timedifference_msec(struct timeval t0, struct timeval t1);
 double sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures);
-//double calculoErrorCuadrado(int Nobjetos, int Ncentros, int Ncaracteristicas, double **centroides, double **datos);
 
 
+//Funcion principal
 int main(argc, argv)
     int argc;
     char * argv[];
 {
-    
+    //Arroja un mensaje de error en caso de no encontrar alguno de los ficheros de texto necesarios para la ejecucion
     if ((fp_data=fopen(argv[1], "r"))==NULL) {
         fprintf(stderr, "No file datos %s\n",argv[1]);
         return 0;
@@ -53,121 +52,74 @@ int main(argc, argv)
         return 0;
     }
     
-    //Comienza el tiempo
-//    start = clock();
-    iteracion=1;
-    gettimeofday(&t0, 0);
+
+    iteracion=0;    //Se inicializa la variable que contará las iteraciones
+    gettimeofday(&t0, 0);   //Se obtiene el tiempo actual a partir de esta funcion, y se almacenan los segundos y microsegundos en la variable de tiempo inicial
     
-    inicializacion(argc,argv);
+    inicializacion(argc,argv);  //Se inicializa lo necesario para comenzar la ejecucion
 
-    fp_data=fopen(argv[1],"r");
-    readData(fp_data, nData,nFeatures, datos);
-    fclose(fp_data);
+    fp_data=fopen(argv[1],"r"); //Se abre en modo lectura el primer argumento recibido, siendo este un fichero con los datos de la muestra y se asigna a su variable reservada
+    readData(fp_data, nData,nFeatures, datos);  //Se leen los datos contenidos en este archivo y se almacenan en una matriz
+    fclose(fp_data); //Se cierra el fichero abierto
 
-    fp_centroides=fopen(argv[4],"r");
-    readData(fp_centroides, nCentroides, nFeatures, centroides);
-
-    centroidesNuevos=centroides;
-
-    fclose(fp_centroides);
+    fp_centroides=fopen(argv[4],"r");   //Se abre en modo lectura el fichero con los centroides iniciales y se asigna a su variable reservada
+    readData(fp_centroides, nCentroides, nFeatures, centroidesPrincipales);    //Se leen los centroides contenidos y se almacenan en una matriz
+    fclose(fp_centroides);  //Se cierra el fichero abierto
     
+   //centroidesNuevos=centroides; //Se crea una copia identica de los centroides iniciales en una matriz secundaria
 
     
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroides[i][j]);
-//        }
-//        printf("\n");
-//    }
-//    
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        printf("Vacios");
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroidesVacio[i][j]);
-//        }
-//        printf("\n");
-//    }
-
-
-    
-    asignacion(datos,centroides,nData,nFeatures,nCentroides);
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        printf("Vacios :");
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroidesNuevos[i][j]);
-//        }
-//        printf("\n");
-//    }
-    recalculo(datos, centroides, nData, nFeatures, nCentroides);
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        printf("Vacios :");
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroidesNuevos[i][j]);
-//        }
-//        printf("\n");
-//    }
-
-    
-    
-//    gettimeofday(&t1, 0);
-//    elapsed = timedifference_msec(t0, t1);
-//    printf("Iteracion %d, %f milliseconds.\n",iteracion, elapsed);
-    
-//    end = clock();
-//    printf("Tiempo: %f\n", (double)(end - start));
-
+    //Comienza el calculo del algoritmo
     do {
-//        gettimeofday(&t1, 0);
-//        elapsed = timedifference_msec(t0, t1);
+        asignacion(datos,centroidesPrincipales,nData,nFeatures,nCentroides); //Se re-asigna grupo a los datos segun el recalculo
+        recalculo(datos, centroidesPrincipales, nData, nFeatures, nCentroides);  //Se re-calcula la posicion de los centroides con los grupos reasignados
         
-//        printf("Iteracion %d, %f milliseconds.\n",iteracion, elapsed);
-//        end = clock();
-//        printf("Tiempo: %f\n", (double)(end - start));
-        asignacion(datos,centroidesNuevos,nData,nFeatures,nCentroides);
-        recalculo(datos, centroidesNuevos, nData, nFeatures, nCentroides);
-        iteracion++;
+        iteracion++;    //Se incrementa la variable de iteracion tras cada ciclo
+        
+        
+        printf("Iteracion: %d\n",iteracion);
+        for (int i=0; i<nData; i++) {
+            
+            
+            for (int j=0; j<nFeatures+1; j++) {
+                printf("%lf ",datos[i][j]);
+            }
+            printf("\n");
+        }
+        
+        for (int i=0; i<nCentroides; i++) {
+            
+            
+            for (int j=0; j<nFeatures; j++) {
+                printf("%lf ",centroidesPrincipales[i][j]);
+            }
+            printf("\n");
+        }
     }
-    while(change==1);
-//    end = clock();
-//    printf("Tiempo final: %f\n", (double)((end - start)));
+    while(change==1);   //Si se detecta algun cambio en el recalculo el algoritmo continua
+    //Termina el algoritmo
+
     
-    gettimeofday(&t1, 0);
+    gettimeofday(&t1, 0);   //Se obtiene el tiempo actual, los segundos y microsegundos se almacenan en la variable reservada para ello
+    
+    
     
     //Error de agrupamiento
-//    double error=calculoErrorCuadrado(nData, nCentroides, nFeatures, centroidesNuevos, datos);
-//    printf("Error: %lf\n",error);
-    double error=sumatoria_error(datos,nData,centroidesNuevos,nCentroides,nFeatures);
+    double error=sumatoria_error(datos,nData,centroidesPrincipales,nCentroides,nFeatures);
     
-    //Numero de iteraciones
-//    printf("Iteraciones: %d\n",iteracion);
-//    
-//    //Tiempo en milisegundos
-    elapsed = timedifference_msec(t0, t1);
-//    printf("%lf milliseconds.\n", elapsed);
-    
-//    for (int i=0; i<nCentroides; i++) {
-//        
-//        printf("Vacios :");
-//        for (int j=0; j<nFeatures; j++) {
-//            printf("%lf ",centroidesNuevos[i][j]);
-//        }
-//        printf("\n");
-//    }
-
-
-    fp_resultados = fopen(argv[6],"a");
-    fprintf(fp_resultados,"%.16g\t %lf\t %d\n", elapsed, error, iteracion); //Imprime en el archivo [Tiempo Error Iteracion]
-    fclose(fp_resultados);
    
-
+    //Tiempo en milisegundos
+    elapsed = timedifference_msec(t0, t1);
+    
+    //Se guarda el tiempo, el error y el numero de iteraciones en el fichero de resultados
+    fp_resultados = fopen(argv[6],"a"); //Se abre el fichero
+    fprintf(fp_resultados,"%.16g\t %lf\t %d\n", elapsed, error, iteracion); //Imprime en el archivo
+    fclose(fp_resultados);  //Se cierra el fichero
+    
     return 0;
 }
 
+//Funcion que lee los datos de un fichero y los aloja en una matriz con el mismo numero de columnas y filas
 void readData(FILE *data, int Ndatos,int Nfeatures,double **datos){
     int i;
     int j;
@@ -183,160 +135,114 @@ void readData(FILE *data, int Ndatos,int Nfeatures,double **datos){
     }
 }
 
+//Funcion que inicializa las varibales necesarias para el algoritmo
 void inicializacion(int argc, char *argv[]){
     
-
-    nData=atoi(argv[2]);
-    nFeatures=atoi(argv[3]);
+    //A partir de los parametros se inicializan las variables
+    nData=atoi(argv[2]);    //Numero de datos en la muestra
+    nFeatures=atoi(argv[3]);    //Numero de caracteristicas de los datos
+    nCentroides=atoi(argv[5]);  //Numero de centroides
     
-    nCentroides=atoi(argv[5]);
-    
-    datos=(double **) malloc(nData*sizeof(double *));
+    datos=(double **) malloc(nData*sizeof(double *));   //Se inicializan las filas de la matriz bidimensional dinamica de la muestra
     
     int i;
     for(i=0;i<nData;i++){
-        datos[i]=(double *)malloc((nFeatures+1)*sizeof(double));
+        datos[i]=(double *)malloc((nFeatures+1)*sizeof(double));    //Se inicializan las columnas de la matriz con una adicional para el grupo asignado
     }
     
     
-    centroides=(double **) malloc(nCentroides*sizeof(double *));
+    centroidesPrincipales=(double **) malloc(nCentroides*sizeof(double *)); //Se inicializan las filas de la matriz bidimensional dinamica de los centroides
     for(i=0;i<nCentroides;i++){
-        centroides[i]=(double *)malloc(nFeatures*sizeof(double));
+        centroidesPrincipales[i]=(double *)malloc(nFeatures*sizeof(double));   //Se inicializan las columnas de la matriz de los centroides
     }
     
-    centroidesNuevos=(double **) malloc(nCentroides*sizeof(double *));
-    for(i=0;i<nCentroides;i++){
-        centroidesNuevos[i]=(double *)malloc(nFeatures*sizeof(double));
-    }
+
     
 }
 
+//Funcion que asigna un grupo a cada objeto en la muestra de acuerdo a los centroides actuales
 void asignacion(double **datos,double **centroides,int nData, int nFeatures, int nCentroides){
     
     int i,j,k,group;
     double distancia;
 
     
-        for (i=0; i<nData; i++) {
-            
+        for (i=0; i<nData; i++) {   //Recorre las filas de la muestra de los datos
 
-            datos[i][nFeatures]=pow(10, 8);
-            group=0;
+            datos[i][nFeatures]=pow(10, 8); //Asigna un valor muy alto en la columna de grupo en el indice actual
+            group=0;    //Se re-inicia la varible grupo para cada fila de datos
 
-            for (k=0; k<nCentroides; k++) {
+            for (k=0; k<nCentroides; k++) { //Recorre segun la cantidad de centroides
                 
-                distancia=0;
+                distancia=0; //Limpia la variable distancia tras el calculo a cada centroide
                 
-                for (j=0; j<nFeatures; j++) {
-
-                    distancia+=pow(datos[i][j]-centroides[k][j], 2);
+                for (j=0; j<nFeatures; j++) {   //Recorre tantas veces como caracteristicas tenga un objeto
+                    distancia+=pow(datos[i][j]-centroides[k][j], 2);    //Obtiene la distancia de cada caracteristica y la suma temporalmente
                 }
-                distancia=sqrt(distancia);
-                if (distancia<datos[i][nFeatures]){
+                distancia=sqrt(distancia);  //Calcula la distancia final hacia el centroide
+                if (distancia<datos[i][nFeatures]){ //Si la distancia es menor a la almacenada en la columna de grupo, esta se actualiza
                     
-                    datos[i][nFeatures]=distancia;
-                    group=(k+1);
+                    datos[i][nFeatures]=distancia;  //Actualiza la distancia
+                    group=(k+1);    //Almacena el grupo prospecto previo a asignarlo al objeto
                 }
-                
-//                printf("Distancia [%d][%d] =%lf\n",i,j,distancia);
-//                printf("Group: %d\n",group);
-                if (k==nCentroides-1) {
-             //       printf("Asigno: %d\n",group);
-                    datos[i][nFeatures]=group;
-//                    printf("datosTres [%d][%d]: %lf\n",i,j,datos[i][nFeatures]);
-//                    printf("Termino una fila\n");
+                if (k==nCentroides-1) { //Si ya se evaluó el ultimo centroide
+                    datos[i][nFeatures]=group;  //Se asgina el grupo al objeto
                 }
             }
     }
-    
-//    for (int i=0; i<nData; i++) {
-//        
-//        
-//        for (int j=0; j<nFeatures+1; j++) {
-//            printf("%lf ",datos[i][j]);
-//        }
-//        printf("\n");
-//    }
+
 }
 
+//Funcion que recalcula la posicion de los centroides
 void recalculo(double **datos, double **centroides,int nData, int nFeatures, int nCentroides){
     
-    int sum;
-    int size;
-    change=0;
+    double sum; //Variable que almacena la suma de las caracteristicas en cada columna para un grupo
+    int size;   //Numero de ocasiones que se repitio ese grupo
+    change=0;   //Bandera de cambio en los centroides
     int i,j,k;
-    for (k=1; k<=nCentroides; k++) {
-        for (j=0; j<nFeatures; j++) {
-            sum=0;
+    for (k=1; k<=nCentroides; k++) {    //Recorre segun la cantidad de centroides
+        for (j=0; j<nFeatures; j++) {   //Recorre segun la cantidad de caracteristicas
+            sum=0;  //Inicializa las variable
             size=0;
  
-            for (i=0; i<nData; i++) {
-                if ((int)datos[i][nFeatures]==k) {
-                    sum+=datos[i][j];
-                    size++;
+            for (i=0; i<nData; i++) {   //Recorre segun la cantidad de datos en la muestra
+                if ((int)datos[i][nFeatures]==k) {  //Evalua el grupo del objeto indicado por el ciclo mas externo
+                    sum+=datos[i][j];   //En dado caso suma el valor de dicha caracteristica
+                    size++; //Incrementa la cantidad de objetos en ese grupo
                 }
             }
-            double centroide=((double)sum/(double)size);
-//            printf("Sum: %d\n",sum);
-//            printf("Size: %d\n",size);
+            double caracteristicaCentroide=((double)sum/(double)size);    //Recalcula el centroide
 
-            if ((double)centroidesNuevos[k-1][j]!=centroide&&isnan(centroide)==0) {
-//                printf("Hubo cambio: %lf",centroidesNuevos[k-1][j]);
-//                printf("Hubo cambio: %lf\n ",((double)sum/(double)size));
-                change=1;
-                
-                centroidesNuevos[k-1][j]=((double)sum/(double)size);
+            if ((double)centroidesPrincipales[k-1][j]!=caracteristicaCentroide&&isnan(caracteristicaCentroide)==0) { //Evalua el centroide actual en caso de que hubiese un cambio
+                change=1;   //Activa la bandera de cambio
+                centroidesPrincipales[k-1][j]=((double)sum/(double)size);    //Actualiza el centroide
             }
-            //Colocar centroides default cuando no cambia
-        
         }
     }
 }
 
+//Funcion que calcula la sumatoria del error al cuadrado
 double sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures ){
     int i,j,k;
-    double error=0;
+    double error=0; //Variable que almacenará el error
+    double distancia;
     
-    for (k=1; k<=nCentroides; k++) {
-        for (i=0; i<nData; i++) {
-            double distancia=0;
-            for (j=0; j<nFeatures; j++) {
-                if (datos[i][nFeatures]==k) {
-                    distancia+=pow(datos[i][j]-centroides[k-1][j], 2);
+    for (k=1; k<=nCentroides; k++) {    //Recorre segun la cantidad de centroides
+        for (i=0; i<nData; i++) {   //Recorre segun la cantidad de datos en la muestra
+            distancia=0;    //Inicializa la distancia tras cada objeto
+            for (j=0; j<nFeatures; j++) {   //Recorre segun la cantidad de caracteristicas
+                if (datos[i][nFeatures]==k) {   //Evalua el grupo del objeto
+                    distancia+=pow(datos[i][j]-centroides[k-1][j], 2);  //Almacena la distancia de esta caracteristia hacia la del centroide
                 }
             }
-            error+=sqrt(distancia);
+            error+=sqrt(distancia); //Calcula y suma el error completo hacia el centroide
         }
     }
-    return error;
+    return error;   //Devuelve el error total
 }
 
-//double calculoErrorCuadrado(int Nobjetos, int Ncentros, int Ncaracteristicas, double **centroides, double **datos){
-//    
-//    int i,j,k;
-//    double sum, error = 0;
-//    
-//    for (i = 0; i < Ncentros; i++){ //Numero de objetos
-//        
-//        for (j = 0; j < Nobjetos; j++){ //Numero de centroides
-//            sum = 0;
-//            
-//            if(datos[j][Ncaracteristicas] == (i+1)){
-//                
-//                for (k = 0; k < Ncaracteristicas; k++){ //Numero de caracteristicas
-//                    sum+= pow( centroides[i][k] - datos[j][k] , 2);
-//                }
-//                error += sqrt(sum);
-//                
-//            }
-//        }
-//        
-//    }
-//    return error;
-//}
-
-
-double timedifference_msec(struct timeval t0, struct timeval t1)
+//Funcion que calcula el tiempo en milisegundos
+double timedifference_msec(struct timeval t0, struct timeval t1) //Recibe el tiempo inicial y final del computo
 {
     return (t1.tv_sec - t0.tv_sec) * 1000.0f + (t1.tv_usec - t0.tv_usec) / 1000.0f;
 }
