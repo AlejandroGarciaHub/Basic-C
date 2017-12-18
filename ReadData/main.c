@@ -24,6 +24,11 @@ double elapsed; //Variable donde se alojará el tiempo transcurrido desde el ini
 int change; //Flag que indica si hubo algun cambio al recalcular los centroides
 int iteracion;  //Aloja el numero de iteraciones necesarias para agrupar los datos
 
+int iteracionMejora=10; //Indica la iteracion desde la cual comenzará a realizarse la mejora
+int mejoraFlag=0; //Indica si se aplicara la mejora o no, 0 es falso, 1 es verdadero
+
+int cambioUnCentroide;
+
 //Declaracion de las funciones
 void readData(FILE *data, int Ndata,int NFeatures,double **datos);//
 void inicializacion(int argc, char *argv[]);
@@ -31,6 +36,7 @@ void asignacion(double **datos,double **centroides,int nData, int nFeatures, int
 void recalculo(double **datos, double **centroides,int nData, int nFeatures, int nCentroides);
 double timedifference_msec(struct timeval t0, struct timeval t1);
 double sumatoria_error(double **datos,int nData,double **centroides,int nCentroides, int nFeatures);
+void centroideEstable(int k);
 
 
 //Funcion principal
@@ -56,6 +62,9 @@ int main(argc, argv)
     iteracion=0;    //Se inicializa la variable que contará las iteraciones
     gettimeofday(&t0, 0);   //Se obtiene el tiempo actual a partir de esta funcion, y se almacenan los segundos y microsegundos en la variable de tiempo inicial
     
+    mejoraFlag=atoi(argv[7]);
+    iteracionMejora=atoi(argv[8]);
+    
     inicializacion(argc,argv);  //Se inicializa lo necesario para comenzar la ejecucion
 
     fp_data=fopen(argv[1],"r"); //Se abre en modo lectura el primer argumento recibido, siendo este un fichero con los datos de la muestra y se asigna a su variable reservada
@@ -77,24 +86,24 @@ int main(argc, argv)
         iteracion++;    //Se incrementa la variable de iteracion tras cada ciclo
         
         
-        printf("Iteracion: %d\n",iteracion);
-        for (int i=0; i<nData; i++) {
-            
-            
-            for (int j=0; j<nFeatures+1; j++) {
-                printf("%lf ",datos[i][j]);
-            }
-            printf("\n");
-        }
-        
-        for (int i=0; i<nCentroides; i++) {
-            
-            
-            for (int j=0; j<nFeatures; j++) {
-                printf("%lf ",centroidesPrincipales[i][j]);
-            }
-            printf("\n");
-        }
+//        printf("Iteracion: %d\n",iteracion);
+//        for (int i=0; i<nData; i++) {
+//            
+//            
+//            for (int j=0; j<nFeatures+2; j++) {
+//                printf("%lf ",datos[i][j]);
+//            }
+//            printf("\n");
+//        }
+//        
+//        for (int i=0; i<nCentroides; i++) {
+//            
+//            
+//            for (int j=0; j<nFeatures+1; j++) {
+//                printf("%lf ",centroidesPrincipales[i][j]);
+//            }
+//            printf("\n");
+//        }
     }
     while(change==1);   //Si se detecta algun cambio en el recalculo el algoritmo continua
     //Termina el algoritmo
@@ -147,16 +156,15 @@ void inicializacion(int argc, char *argv[]){
     
     int i;
     for(i=0;i<nData;i++){
-        datos[i]=(double *)malloc((nFeatures+1)*sizeof(double));    //Se inicializan las columnas de la matriz con una adicional para el grupo asignado
+        datos[i]=(double *)malloc((nFeatures+2)*sizeof(double));    //Se inicializan las columnas de la matriz con una adicional para el grupo asignado
     }
     
     
     centroidesPrincipales=(double **) malloc(nCentroides*sizeof(double *)); //Se inicializan las filas de la matriz bidimensional dinamica de los centroides
     for(i=0;i<nCentroides;i++){
-        centroidesPrincipales[i]=(double *)malloc(nFeatures*sizeof(double));   //Se inicializan las columnas de la matriz de los centroides
+        centroidesPrincipales[i]=(double *)malloc((nFeatures+1)*sizeof(double));   //Se inicializan las columnas de la matriz de los centroides
     }
     
-
     
 }
 
@@ -167,7 +175,7 @@ void asignacion(double **datos,double **centroides,int nData, int nFeatures, int
     double distancia;
 
     
-        for (i=0; i<nData; i++) {   //Recorre las filas de la muestra de los datos
+        for (i=0; i<nData&&datos[i][nFeatures+1]!=1; i++) {   //Recorre las filas de la muestra de los datos
 
             datos[i][nFeatures]=pow(10, 8); //Asigna un valor muy alto en la columna de grupo en el indice actual
             group=0;    //Se re-inicia la varible grupo para cada fila de datos
@@ -200,10 +208,12 @@ void recalculo(double **datos, double **centroides,int nData, int nFeatures, int
     int size;   //Numero de ocasiones que se repitio ese grupo
     change=0;   //Bandera de cambio en los centroides
     int i,j,k;
-    for (k=1; k<=nCentroides; k++) {    //Recorre segun la cantidad de centroides
+    for (k=1; k<=nCentroides&&centroidesPrincipales[k-1][nFeatures]!=1; k++) {    //Recorre segun la cantidad de centroides
         for (j=0; j<nFeatures; j++) {   //Recorre segun la cantidad de caracteristicas
             sum=0;  //Inicializa las variable
             size=0;
+            
+            cambioUnCentroide=0;
  
             for (i=0; i<nData; i++) {   //Recorre segun la cantidad de datos en la muestra
                 if ((int)datos[i][nFeatures]==k) {  //Evalua el grupo del objeto indicado por el ciclo mas externo
@@ -215,8 +225,24 @@ void recalculo(double **datos, double **centroides,int nData, int nFeatures, int
 
             if ((double)centroidesPrincipales[k-1][j]!=caracteristicaCentroide&&isnan(caracteristicaCentroide)==0) { //Evalua el centroide actual en caso de que hubiese un cambio
                 change=1;   //Activa la bandera de cambio
+                cambioUnCentroide=1;
                 centroidesPrincipales[k-1][j]=((double)sum/(double)size);    //Actualiza el centroide
             }
+            //Al terminar de evaluar un centroide se determina si no ha cambiado de lugar
+            else if(j==nFeatures-1&&cambioUnCentroide==0&&iteracion>iteracionMejora&&mejoraFlag==1){
+                //De ser asi se establece como estable
+                centroidesPrincipales[k-1][nFeatures]=1; //La ultima columna del centroide se activa como verdadera
+                centroideEstable(k); //Se llama a la funcion correspondiente que establece como estable a todo el grupo del ahora centroide estable
+            }
+        }
+    }
+}
+
+//Fucion que establece como estables los objetos correspodientes a un centroide estable
+void centroideEstable(int k){
+    for (int i=0; i<nData; i++) {
+        if (datos[i][nFeatures]==(double)k) {
+            datos[i][nFeatures+1]=1;
         }
     }
 }

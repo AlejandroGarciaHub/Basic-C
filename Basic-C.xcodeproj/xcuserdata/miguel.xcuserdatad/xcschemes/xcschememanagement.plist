@@ -29,6 +29,11 @@
 			<key>orderHint</key>
 			<integer>10</integer>
 		</dict>
+		<key>K-Means-Difuso.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>12</integer>
+		</dict>
 		<key>Null-Pointers.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -63,6 +68,11 @@
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>
+		</dict>
+		<key>Test.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>13</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -123,6 +133,11 @@
 			<true/>
 		</dict>
 		<key>498D6D3D1F588FC100FFC523</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>49FC9C7D1F82B9ED001DE150</key>
 		<dict>
 			<key>primary</key>
 			<true/>
